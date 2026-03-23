@@ -1,3 +1,4 @@
+from sqlalchemy import text
 from sqlalchemy.ext.asyncio import (
     AsyncEngine,
     AsyncSession,
@@ -53,6 +54,11 @@ class DatabaseManager:
                 "Сначала вызовите DatabaseManager.init()."
             )
         return self._session_factory
+
+    async def ping(self) -> bool:
+        async with self.session_factory() as session:
+            result = await session.execute(text("SELECT 1"))
+            return result.scalar() == 1
 
     async def dispose(self) -> None:
         if self._engine is not None:
